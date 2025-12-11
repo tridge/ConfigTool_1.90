@@ -42,7 +42,7 @@ jobs:
       shell: cmd
       run: |
         mkdir deploy
-        copy build\SerialPortConnector.exe deploy\
+        copy build\release\SerialPortConnector.exe deploy\
         set PATH=%IQTA_TOOLS%\mingw1120_64\bin;%PATH%
         windeployqt --release deploy\SerialPortConnector.exe
 
