@@ -26,27 +26,31 @@ jobs:
         target: 'desktop'
         arch: 'win64_mingw'
         modules: 'qtserialport'
+        tools: 'tools_mingw90'
         cache: true
 
     - name: Build
       shell: cmd
       run: |
-        set PATH=C:\mingw64\bin;%PATH%
+        set PATH=%IQTA_TOOLS%\mingw1120_64\bin;%PATH%
         mkdir build
         cd build
         qmake ..\SerialPortConnector.pro CONFIG+=release
         mingw32-make -j4
 
     - name: Deploy
-      working-directory: build
+      shell: cmd
       run: |
-        windeployqt --release release/SerialPortConnector.exe
+        mkdir deploy
+        copy build\SerialPortConnector.exe deploy\
+        set PATH=%IQTA_TOOLS%\mingw1120_64\bin;%PATH%
+        windeployqt --release deploy\SerialPortConnector.exe
 
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
       with:
         name: SerialPortConnector-Windows
-        path: build/release/
+        path: deploy/
         
   build-linux:
     runs-on: ubuntu-22.04  # Use 22.04 for glibc 2.35 compatibility
