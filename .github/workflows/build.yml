@@ -42,18 +42,11 @@ jobs:
       run: |
         windeployqt --release release/SerialPortConnector.exe
 
-    - name: Package
-      working-directory: build
-      run: |
-        mkdir -p package
-        xcopy /E /I release\* package\
-        7z a -tzip SerialPortConnector-Windows.zip package
-
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
       with:
         name: SerialPortConnector-Windows
-        path: build/SerialPortConnector-Windows.zip
+        path: build/release/
         
   build-linux:
     runs-on: ubuntu-22.04  # Use 22.04 for glibc 2.35 compatibility
@@ -168,16 +161,21 @@ jobs:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
-      
+
+    - name: Package Windows artifact
+      run: |
+        cd SerialPortConnector-Windows
+        zip -r ../SerialPortConnector-Windows.zip .
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          SerialPortConnector-Windows/*.zip
+          SerialPortConnector-Windows.zip
           SerialPortConnector-Linux/*.AppImage
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
